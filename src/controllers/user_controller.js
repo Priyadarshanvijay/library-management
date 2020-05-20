@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const Issue_Request = require('../models/issue_request');
+const moment = require('moment');
 
 async function loginUser(req, res) {
   try {
@@ -12,8 +14,10 @@ async function loginUser(req, res) {
 
 async function registerUser(req, res) {
   const user = new User(req.body);
-
+  const noOfDays = req.body.noOfDays;
   try {
+    user.validFrom = moment().toDate();
+    user.validTill = moment().add(noOfDays, 'days').toDate();
     await user.save();
     const token = await user.generateAuthToken();
     res.status(201).send({ user, token });
@@ -22,7 +26,38 @@ async function registerUser(req, res) {
   }
 };
 
+async function getIssuedHistory(req, res) {
+  try {
+    const issued_history = await Issue_Request.find({ issuer: req.user._id });
+    for (let i = 0; i < issued_history.length; ++i) {
+      await issued_history[i].populate('book').execPopulate();
+    }
+    res.json(issued_history);
+  } catch (e) {
+    console.log(e);
+    res.status(400).json(e);
+  }
+}
+
+async function deleteIssuedHistory(req, res) {
+  try {
+    const req_id = req.params.id;
+    const issuer_id = req.user._id;
+    const issued_request = await Issue_Request.findOneAndDelete({ _id: req_id, issuer: issuer_id });
+    if (!issued_request) {
+      res.status(404).json()
+      return;
+    }
+    res.json(issued_request)
+  } catch (e) {
+    console.log(e);
+    res.status(400).json(e);
+  }
+}
+
 module.exports = {
   loginUser,
-  registerUser
+  registerUser,
+  getIssuedHistory,
+  deleteIssuedHistory
 }

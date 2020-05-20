@@ -31,6 +31,14 @@ const userSchema = new mongoose.Schema({
         throw new Error('Password cannot contain "password"');
       }
     }
+  },
+  validFrom: {  
+    type: Date,
+    required: true
+  },
+  validTill: {
+    type: Date,
+    required: true
   }
 });
 

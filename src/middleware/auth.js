@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+const admin_auth = require('./admin_auth')
+
 
 const auth = async (req, res, next) => {
   try {
@@ -8,12 +10,13 @@ const auth = async (req, res, next) => {
     const user = await User.findOne({ _id: decoded._id })
 
     if (!user) {
-      throw new Error()
+      admin_auth(req, res, next);
     }
-
-    req.token = token
-    req.user = user
-    next()
+    else {
+      req.token = token
+      req.user = user
+      next()
+    }
   } catch (e) {
     res.status(401).send({ error: 'Please authenticate.' })
   }

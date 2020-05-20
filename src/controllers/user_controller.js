@@ -49,7 +49,7 @@ async function deleteIssuedHistory(req, res) {
     if (!issued_request) {
       throw new Error('No Such Request Found');
     }
-    if(issued_request.status === 3 || issued_request.status === 1) {
+    if (issued_request.status === 3 || issued_request.status === 1) {
       throw new Error('Cannot Delete Currently Issued books history');
     }
     const deleted_request = await Issue_Request.findOneAndDelete({ _id: req_id, issuer: issuer_id });
@@ -60,9 +60,45 @@ async function deleteIssuedHistory(req, res) {
   }
 }
 
+async function updateSelf(req, res) {
+  try {
+    const user = req.user;
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ['name', 'email', 'password'];
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+    if (!isValidOperation) {
+      throw new Error('Invalid updates!');
+    }
+    updates.forEach((update) => user[update] = req.body[update]);
+    await user.save();
+    res.json(user);
+  } catch (e) {
+    res.status(400).json({ error: e });
+  }
+}
+
+async function updateUser(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ['name', 'email', 'validTill', 'readingHoursRemaining'];
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+    if (!isValidOperation) {
+      throw new Error('Invalid updates!');
+    }
+    updates.forEach((update) => user[update] = req.body[update]);
+    await user.save();
+    res.json(user);
+  } catch (e) {
+    res.status(400).json({ error: e });
+  }
+}
+
 module.exports = {
   loginUser,
   registerUser,
   getIssuedHistory,
-  deleteIssuedHistory
+  deleteIssuedHistory,
+  updateSelf,
+  updateUser
 }

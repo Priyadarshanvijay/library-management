@@ -108,6 +108,7 @@ async function issueReq(req, res) {
       }
     }
     const issuer = await User.findById(user_id);
+    const book_to_issue = await Book.findById(book_id);
     if (issue_type === 1) {
       //To take to home
       const now = moment().toDate();
@@ -115,14 +116,19 @@ async function issueReq(req, res) {
       if (days_left_in_membership <= 5) {
         throw new Error('Less than 5 days remaining in membership');
       }
+      if (!book_to_issue.forHome) {
+        throw new Error('Book not available to issue for home');
+      }
     } else {
       //read here till 5 pm
       const time_till_5pm = 17 - moment().hour();
       if (issuer.readingHoursRemaining < time_till_5pm) {
         throw new Error('Not Enough reading hours remaining in membership');
       }
+      if (!book_to_issue.forLibrary) {
+        throw new Error('Book not available to issue for library Reading');
+      }
     }
-    const book_to_issue = await Book.findById(book_id);
     if (book_to_issue.issued >= book_to_issue.copies) {
       throw new Error('No more copies left to issue');
     }

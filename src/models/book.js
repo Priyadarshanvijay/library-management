@@ -31,6 +31,14 @@ const bookSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  forHome: {
+    type: Boolean,
+    required: true
+  },
+  forLibrary: {
+    type: Boolean,
+    required: true
   }
 });
 

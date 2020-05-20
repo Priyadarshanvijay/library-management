@@ -31,6 +31,12 @@ const requestSchema = new mongoose.Schema({
   },
   returnedOn: {
     type: Date
+  },
+  issueType: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 1       // 0-> For Reaing at library, 1-> Taking at home
   }
 });
 

@@ -39,6 +39,11 @@ const userSchema = new mongoose.Schema({
   validTill: {
     type: Date,
     required: true
+  },
+  readingHoursRemaining: {
+    type: Number,
+    min: 0,
+    required: true
   }
 });
 

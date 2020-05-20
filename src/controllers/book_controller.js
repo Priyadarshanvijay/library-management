@@ -45,20 +45,39 @@ async function issueBook(req, res) {
   const approve = req.body.approve;
   try {
     const issue_request = await Issue_Request.findById(issue_request_id);
+    const issue_type = issue_request.issueType;   // 1-> Taking to home, 0-> Reading at the library
+    if (issue_type === 1) {
+      if (moment().hour() >= 17 || moment().hour() < 10) {
+        throw new Error('Book can be issued for home only between 10 AM and 5 PM');
+      }
+    } else {
+      if (moment().hour() >= 15 || moment().hour() < 10) {
+        throw new Error('Book can be issued for reading only between 10 AM and 3 PM');
+      }
+    }
     if (approve) {
       const book_to_issue = await Book.findById(issue_request.book);
       const issuer = await User.findById(issue_request.issuer);
-      const now = moment().toDate();
-      const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
-      if (days_left_in_membership <= 5) {
-        throw new Error('Less than 5 days remaining in membership');
+      if (issue_type === 1) {
+        //To take to home
+        const now = moment().toDate();
+        const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
+        if (days_left_in_membership <= 5) {
+          throw new Error('Less than 5 days remaining in membership');
+        }
+      } else {
+        //read here till 5 pm
+        const time_till_5pm = 17 - moment().hour();
+        if (issuer.readingHoursRemaining < time_till_5pm) {
+          throw new Error('Not Enough reading hours remaining in membership');
+        }
       }
       if (book_to_issue.issued >= book_to_issue.copies) {
         throw new Error('No more copies left to issue');
       }
       book_to_issue.issued += 1;
       issue_request.issueDate = moment().toDate();
-      issue_request.returnDate = moment().add(7, 'days').toDate();
+      issue_request.returnDate = (issueType === 1) ? moment().add(7, 'days').toDate() : moment().add((17 - moment().hour()), 'hours');
       issue_request.status = 1;    //Approved
       await book_to_issue.save();
       await issue_request.save();
@@ -75,24 +94,44 @@ async function issueBook(req, res) {
 }
 
 async function issueReq(req, res) {
-  const book_id = req.params.id;
-  const user_id = req.user._id;
   try {
+    const book_id = req.params.id;
+    const user_id = req.user._id;
+    const issue_type = req.body.home === true ? 1 : 0;   // 1-> Taking to home, 0-> Reading at the library
+    if (issue_type === 1) {
+      if (moment().hour() >= 17 || moment().hour() < 10) {
+        throw new Error('Book can be issued for home only between 10 AM and 5 PM');
+      }
+    } else {
+      if (moment().hour() >= 15 || moment().hour() < 10) {
+        throw new Error('Book can be issued for reading only between 10 AM and 3 PM');
+      }
+    }
     const issuer = await User.findById(user_id);
-    const now = moment().toDate();
-    const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
-    if (days_left_in_membership <= 5) {
-      throw new Error('Less than 5 days remaining in membership');
+    if (issue_type === 1) {
+      //To take to home
+      const now = moment().toDate();
+      const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
+      if (days_left_in_membership <= 5) {
+        throw new Error('Less than 5 days remaining in membership');
+      }
+    } else {
+      //read here till 5 pm
+      const time_till_5pm = 17 - moment().hour();
+      if (issuer.readingHoursRemaining < time_till_5pm) {
+        throw new Error('Not Enough reading hours remaining in membership');
+      }
     }
     const book_to_issue = await Book.findById(book_id);
     if (book_to_issue.issued >= book_to_issue.copies) {
       throw new Error('No more copies left to issue');
     }
     const issue_request = new Issue_Request({
-      date: now,
+      date: moment().toDate(),
       issuer: user_id,
       book: book_id,
-      status: 0
+      status: 0,
+      issueType: issue_type
     });
     await issue_request.save();
     res.status(200).json(issue_request);
@@ -106,6 +145,9 @@ async function issueReq(req, res) {
 async function returnReq(req, res) {
   const issue_request_id = req.params.id;
   try {
+    if (moment().hour() >= 17 || moment().hour() < 10) {
+      throw new Error('Book can be returned only between 10 AM and 5 PM');
+    }
     const issue_request = await Issue_Request.findOne({ _id: issue_request_id, issuer: req.user._id, status: 2 });
     issue_request.status = 3;    //Return Requested
     await issue_request.save();
@@ -119,7 +161,17 @@ async function returnReq(req, res) {
 async function returnBook(req, res) {
   const issue_request_id = req.params.id;
   try {
+    if (moment().hour() >= 17 || moment().hour() < 10) {
+      throw new Error('Book can be returned only between 10 AM and 5 PM');
+    }
     const issue_request = await Issue_Request.findById(issue_request_id);
+    const issue_type = issue_request.issueType;
+    if (issue_type === 0) {
+      const reading_time_in_hrs = moment(issue_request.issueDate).hour() - moment().hour();
+      const user = await User.findById(issue_request.issuer);
+      user.readingHoursRemaining -= reading_time_in_hrs;
+      await user.save();
+    }
     const book_to_issue = await Book.findById(issue_request.book);
     book_to_issue.issued -= 1;
     issue_request.status = 4;    //Returned

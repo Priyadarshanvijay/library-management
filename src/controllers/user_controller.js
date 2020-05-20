@@ -15,9 +15,11 @@ async function loginUser(req, res) {
 async function registerUser(req, res) {
   const user = new User(req.body);
   const noOfDays = req.body.noOfDays;
+  const readingHoursAlloted = req.body.readingHours;
   try {
     user.validFrom = moment().toDate();
     user.validTill = moment().add(noOfDays, 'days').toDate();
+    user.readingHoursRemaining = readingHoursAlloted;
     await user.save();
     const token = await user.generateAuthToken();
     res.status(201).send({ user, token });

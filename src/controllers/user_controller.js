@@ -43,12 +43,15 @@ async function deleteIssuedHistory(req, res) {
   try {
     const req_id = req.params.id;
     const issuer_id = req.user._id;
-    const issued_request = await Issue_Request.findOneAndDelete({ _id: req_id, issuer: issuer_id });
+    const issued_request = await Issue_Request.findOne({ _id: req_id, issuer: issuer_id });
     if (!issued_request) {
-      res.status(404).json()
-      return;
+      throw new Error('No Such Request Found');
     }
-    res.json(issued_request)
+    if(issued_request.status === 3 || issued_request.status === 1) {
+      throw new Error('Cannot Delete Currently Issued books history');
+    }
+    const deleted_request = await Issue_Request.findOneAndDelete({ _id: req_id, issuer: issuer_id });
+    res.json(deleted_request);
   } catch (e) {
     console.log(e);
     res.status(400).json(e);

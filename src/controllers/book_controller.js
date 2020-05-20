@@ -1,0 +1,198 @@
+const moment = require('moment');
+const Book = require('../models/book');
+const User = require('../models/user');
+const Issue_Request = require('../models/issue_request');
+
+async function newBook(req, res) {
+  try {
+    const book = new Book(req.body);
+    await book.save();
+    res.status(200).json(book);
+  }
+  catch (e) {
+    res.status(400).send(e);
+  }
+}
+
+async function getAllBooks(req, res) {
+  try {
+    const books = await Book.find();
+    for (let i = 0; i < books.length; ++i) {
+      await books[i].populate('author').execPopulate();
+    }
+    res.status(200).json(books);
+  }
+  catch (e) {
+    console.log(e)
+    res.status(400).send(e);
+  }
+}
+
+async function getBookById(req, res) {
+  try {
+    const _id = req.params.id;
+    const book = await Book.findOne({ _id });
+    await book.populate('author').execPopulate();
+    res.status(200).json(book);
+  }
+  catch (e) {
+    res.status(400).send(e);
+  }
+}
+
+async function issueBook(req, res) {
+  const issue_request_id = req.params.id;
+  const approve = req.body.approve;
+  try {
+    const issue_request = await Issue_Request.findById(issue_request_id);
+    if (approve) {
+      const book_to_issue = await Book.findById(issue_request.book);
+      const issuer = await User.findById(issue_request.issuer);
+      const now = moment().toDate();
+      const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
+      if (days_left_in_membership <= 5) {
+        throw new Error('Less than 5 days remaining in membership');
+      }
+      if (book_to_issue.issued >= book_to_issue.copies) {
+        throw new Error('No more copies left to issue');
+      }
+      book_to_issue.issued += 1;
+      issue_request.issueDate = moment().toDate();
+      issue_request.returnDate = moment().add(7, 'days').toDate();
+      issue_request.status = 1;    //Approved
+      await book_to_issue.save();
+      await issue_request.save();
+    }
+    else {
+      issue_request.status = 2;    //Rejected
+      await issue_request.save();
+    }
+    res.status(200).json(issue_request);
+  }
+  catch (e) {
+    res.status(400).send(e);
+  }
+}
+
+async function issueReq(req, res) {
+  const book_id = req.params.id;
+  const user_id = req.user._id;
+  try {
+    const issuer = await User.findById(user_id);
+    const now = moment().toDate();
+    const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
+    if (days_left_in_membership <= 5) {
+      throw new Error('Less than 5 days remaining in membership');
+    }
+    const book_to_issue = await Book.findById(book_id);
+    if (book_to_issue.issued >= book_to_issue.copies) {
+      throw new Error('No more copies left to issue');
+    }
+    const issue_request = new Issue_Request({
+      date: now,
+      issuer: user_id,
+      book: book_id,
+      status: 0
+    });
+    await issue_request.save();
+    res.status(200).json(issue_request);
+  }
+  catch (e) {
+    console.log(e.message);
+    res.status(400).json(e.message);
+  }
+}
+
+async function returnReq(req, res) {
+  const issue_request_id = req.params.id;
+  try {
+    const issue_request = await Issue_Request.findOne({ _id: issue_request_id, issuer: req.user._id, status: 2 });
+    issue_request.status = 3;    //Return Requested
+    await issue_request.save();
+    res.status(200).json(issue_request);
+  }
+  catch (e) {
+    res.status(400).send(e);
+  }
+}
+
+async function returnBook(req, res) {
+  const issue_request_id = req.params.id;
+  try {
+    const issue_request = await Issue_Request.findById(issue_request_id);
+    const book_to_issue = await Book.findById(issue_request.book);
+    book_to_issue.issued -= 1;
+    issue_request.status = 4;    //Returned
+    issue_request.returnedOn = moment().toDate();
+    await book_to_issue.save();
+    await issue_request.save();
+    res.status(200).json(issue_request);
+  }
+  catch (e) {
+    res.status(400).send(e);
+  }
+}
+
+async function allIssueReq(req, res) {
+  try {
+    const filter = {};
+    if ((typeof req.query.issued !== 'undefined') && (req.query.issued === 'true')) {
+      filter.status = { $in: [1, 3] }
+    } else if ((typeof req.query.rejected !== 'undefined') && (req.query.rejected === 'true')) {
+      filter.status = 2
+    } else if ((typeof req.query.returned !== 'undefined') && (req.query.returned === 'true')) {
+      filter.status = 4
+    } else if ((typeof req.query.issue_pending !== 'undefined') && (req.query.issue_pending === 'true')) {
+      filter.status = 0
+    } else if ((typeof req.query.return_pending !== 'undefined') && (req.query.return_pending === 'true')) {
+      filter.status = 3
+    }
+    const issue_requests = await Issue_Request.find(filter);
+    for (let i = 0; i < issue_requests.length; ++i) {
+      await issue_requests[i].populate('issuer').populate('book').execPopulate();
+    }
+    res.json(issue_requests);
+  } catch (e) {
+    res.status(404).json(e);
+  }
+}
+
+async function updateBook(req, res) {
+  try {
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ['name', 'ISBN', 'author', 'copies', 'issued'];
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+      throw new Error('Invalid updates!');
+    }
+    const book_to_update = await Book.findById(req.params.id);
+    updates.forEach((update) => book_to_update[update] = req.body[update])
+    await book_to_update.save()
+    res.json(book_to_update)
+  } catch (e) {
+    res.status(400).json({ error: e });
+  }
+}
+
+async function deleteBook(req, res) {
+  try {
+    const book_to_update = await Book.findByIdAndDelete(req.params.id);
+    res.json(book_to_update)
+  } catch (e) {
+    res.status(400).json({ error: e });
+  }
+}
+
+module.exports = {
+  newBook,
+  getAllBooks,
+  getBookById,
+  issueBook,
+  issueReq,
+  returnReq,
+  returnBook,
+  allIssueReq,
+  updateBook,
+  deleteBook
+}

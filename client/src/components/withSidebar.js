@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Sidebar, Menu, Segment, Icon, Container } from 'semantic-ui-react';
-import AddBookButton from './sub-componenets/addBookButton';
 import IssueReturnRequestButton from './sub-componenets/issueReturnRequestButton';
 
 export const withSidebar = (Component) => {
@@ -36,7 +35,9 @@ export const withSidebar = (Component) => {
             <Icon name='user' />
             Hi {user.name}
           </Menu.Item>
-          <AddBookButton />
+          <Menu.Item as='a' onClick={() => { history.push('/books') }}>
+            <Icon name='book' />Books
+          </Menu.Item>
           <IssueReturnRequestButton />
           <Menu.Item onClick={logout} as='a'>
             <Icon name='sign-out' />
@@ -44,7 +45,7 @@ export const withSidebar = (Component) => {
           </Menu.Item>
         </Sidebar>
 
-        <Sidebar.Pusher>
+        <Sidebar.Pusher style={{ height: '100vh', overflowY: 'scroll' }}>
           <Container fluid style={{ marginTop: '2%', paddingRight: '15%' }} >
             <Component {...props} />
           </Container>

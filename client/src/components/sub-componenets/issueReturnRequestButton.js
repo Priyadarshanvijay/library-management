@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, Icon } from 'semantic-ui-react';
 import { useHistory } from 'react-router-dom';
-import {withAdminAuthSubComponent} from '../auth_components/withAdminAuth-SubComponent';
+import { withAdminAuthSubComponent } from '../auth_components/withAdminAuth-SubComponent';
 
 const IssueReturnRequestButton = () => {
   const history = useHistory();

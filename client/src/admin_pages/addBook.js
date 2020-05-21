@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Segment, Form, Grid, Button, Dropdown } from 'semantic-ui-react';
-import { withSidebar } from './components/withSidebar';
-import AddAuthor from './components/addAuthor';
+import { useHistory } from 'react-router-dom';
+import { withSidebar } from '../components/withSidebar';
+import { withAdminAuth } from '../components/auth_components/withAdminAuth';
+import AddAuthor from '../components/addAuthor';
 const axios = require('axios').default;
 
 const AddBook = (props) => {
+  const history = useHistory();
   const [authors, setAuthors] = useState([]);
   const [bookName, setBookName] = useState('');
   const [ISBN, setISBN] = useState('');
@@ -65,7 +68,7 @@ const AddBook = (props) => {
         Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         "Content-Type": "application/json"
       }
-      const response = await axios.post(`${process.env.REACT_APP_BASE_URI}/book`,formData,{
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URI}/book`, formData, {
         headers
       });
     } catch (e) {
@@ -118,10 +121,10 @@ const AddBook = (props) => {
         </Grid>
         <br />
         <Button loading={sendingData} onClick={postData} disabled={sendingData} primary>Add Book</Button>
-        <Button disabled={sendingData} negative>Cancel</Button>
+        <Button disabled={sendingData} onClick={() => { history.push('/') }} negative>Cancel</Button>
       </Form>
     </Segment>
   )
 }
 
-export default withSidebar(AddBook)
+export default withAdminAuth(withSidebar(AddBook));

@@ -5,11 +5,12 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-import LoginForm from './LoginForm';
-import AdminLoginForm from './AdminLoginForm';
+import LoginForm from './user_pages/LoginForm';
+import AdminLoginForm from './admin_pages/AdminLoginForm';
 import Home from './home';
-import AddBook from './addBook';
-import {UserProtectedRoute, AdminProtectedRoute} from './components/protectedRoutes';
+import AddBook from './admin_pages/addBook';
+import ViewRequests from './admin_pages/viewRequest';
+import {UserProtectedRoute, AdminProtectedRoute} from './components/auth_components/protectedRoutes';
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
         </Route>
         <Route path="/books/add">
           <AddBook />
+        </Route>
+        <Route exact path="/requests">
+          <ViewRequests />
         </Route>
         <Route  path="/admin/login" >
           <AdminLoginForm />

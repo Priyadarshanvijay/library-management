@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Grid, Modal, Form } from 'semantic-ui-react';
+import {withAdminAuthSubComponent} from './auth_components/withAdminAuth-SubComponent';
 const axios = require('axios').default;
 
 const AddAuthor = ({ setAuthors }) => {
@@ -94,4 +95,4 @@ const AddAuthor = ({ setAuthors }) => {
   )
 }
 
-export default AddAuthor;
+export default withAdminAuthSubComponent(AddAuthor);

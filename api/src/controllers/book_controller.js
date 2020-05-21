@@ -10,7 +10,7 @@ async function newBook(req, res) {
     res.status(200).json(book);
   }
   catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -23,8 +23,7 @@ async function getAllBooks(req, res) {
     res.status(200).json(books);
   }
   catch (e) {
-    console.log(e)
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -36,7 +35,7 @@ async function getBookById(req, res) {
     res.status(200).json(book);
   }
   catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -89,7 +88,7 @@ async function issueBook(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -143,8 +142,7 @@ async function issueReq(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    console.log(e.message);
-    res.status(400).json(e.message);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -160,7 +158,7 @@ async function returnReq(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -187,7 +185,7 @@ async function returnBook(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -211,7 +209,7 @@ async function allIssueReq(req, res) {
     }
     res.json(issue_requests);
   } catch (e) {
-    res.status(404).json(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -229,7 +227,7 @@ async function updateBook(req, res) {
     await book_to_update.save()
     res.json(book_to_update)
   } catch (e) {
-    res.status(400).json({ error: e });
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -238,7 +236,7 @@ async function deleteBook(req, res) {
     const book_to_update = await Book.findByIdAndDelete(req.params.id);
     res.json(book_to_update)
   } catch (e) {
-    res.status(400).json({ error: e });
+    res.status(400).json({ error: e.message });
   }
 }
 

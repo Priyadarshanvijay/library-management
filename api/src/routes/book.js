@@ -14,6 +14,6 @@ router.delete('/book/:id', admin_auth, deleteBook);
 router.patch('/book/:id/issue', admin_auth, issueBook);
 router.post('/book/:id/issuereq', auth, issueReq);
 router.post('/book/:id/returnreq', auth, returnReq);
-router.post('/book/:id/return', admin_auth, returnBook);
+router.patch('/book/:id/return', admin_auth, returnBook);
 
 module.exports = router;

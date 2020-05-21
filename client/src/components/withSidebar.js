@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Sidebar, Menu, Segment, Icon, Container } from 'semantic-ui-react';
 import AddBookButton from './sub-componenets/addBookButton';
+import IssueReturnRequestButton from './sub-componenets/issueReturnRequestButton';
 
 export const withSidebar = (Component) => {
   return function (props) {
@@ -36,6 +37,7 @@ export const withSidebar = (Component) => {
             Hi {user.name}
           </Menu.Item>
           <AddBookButton />
+          <IssueReturnRequestButton />
           <Menu.Item onClick={logout} as='a'>
             <Icon name='sign-out' />
             Logout

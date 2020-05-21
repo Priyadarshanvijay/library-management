@@ -7,24 +7,24 @@ import {
 } from "react-router-dom";
 import LoginForm from './LoginForm';
 import AdminLoginForm from './AdminLoginForm';
+import Home from './home';
+import AddBook from './addBook';
 import {UserProtectedRoute, AdminProtectedRoute} from './components/protectedRoutes';
 
 function App() {
   return (
-    <Router>
+    <Router forceRefresh={true}>
       <Switch>
         <Route path="/login">
           <LoginForm />
         </Route>
+        <Route path="/books/add">
+          <AddBook />
+        </Route>
         <Route  path="/admin/login" >
           <AdminLoginForm />
         </Route>
-        <Route exact path="/">
-          <div>Page Does'nt Exists Right now</div>
-        </Route>
-        <Route path="/">
-          <div>Page Does'nt Exists Right now</div>
-        </Route>
+        <UserProtectedRoute component={Home} path="/" />
       </Switch>
     </Router>
   );

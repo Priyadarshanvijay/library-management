@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { withSidebar } from './components/withSidebar';
 import { Segment, Grid, Card, Icon, Button, Message } from 'semantic-ui-react';
-import AddBookButton from './components/sub-componenets/addBookButton'
+import AddBookButton from './components/sub-componenets/addBookButton';
+import EditBookButtons from './components/sub-componenets/editBookButtons';
 const axios = require('axios').default;
 
 const BookCard = ({ name, author, copies, issued }) => (
@@ -14,8 +15,7 @@ const BookCard = ({ name, author, copies, issued }) => (
           Total: {copies} / Issued: {issued}
         </Card.Content>
       </Card>
-      <Button content='Edit' primary />
-      <Button content='Delete' negative />
+      <EditBookButtons />
     </Segment>
   </Grid.Column>
 )

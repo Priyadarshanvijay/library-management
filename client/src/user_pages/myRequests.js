@@ -43,6 +43,7 @@ const MyRequests = () => {
           });
         } else {
           //delete 
+          const headers = { Authorization: `Bearer ${localStorage.getItem('auth_token')}` };
           const response = await axios.delete(`${process.env.REACT_APP_BASE_URI}/user/issued/${request._id}`, {}, { headers });
         }
       } catch (e) {

@@ -30,6 +30,9 @@ export async function isUserLoggedIn() {
     if (!user) {
       return false;
     }
+    if (typeof user.global !== 'undefined') {
+      return false;
+    }
     return true;
   } catch (e) {
     return false;

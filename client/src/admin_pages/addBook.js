@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Segment, Form, Grid, Button, Dropdown } from 'semantic-ui-react';
 import { useHistory } from 'react-router-dom';
-import { withSidebar } from '../components/withSidebar';
+import withSidebar from '../components/withSidebar';
 import { withAdminAuth } from '../components/auth_components/withAdminAuth';
 import AddAuthor from '../components/addAuthor';
 const axios = require('axios').default;

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Sidebar, Menu, Segment, Icon, Container } from 'semantic-ui-react';
 import IssueReturnRequestButton from './sub-componenets/issueReturnRequestButton';
+import {withAuthSubComponent} from './auth_components/withAuth-SubComponent'
 
-export const withSidebar = (Component) => {
+const withSidebar = (Component) => {
   return function (props) {
     const history = useHistory();
     const [user, changeUser] = useState(JSON.parse(localStorage.getItem('user')));
@@ -12,7 +13,7 @@ export const withSidebar = (Component) => {
       history.push("/");
     }
     return (
-      <Sidebar.Pushable as={Segment} style={{ height: '100vh' }}>
+      <Sidebar.Pushable as={Segment} style={{ overflowY:'hidden',height: '100vh' }}>
         <Sidebar
           as={Menu}
           icon='labeled'
@@ -25,6 +26,7 @@ export const withSidebar = (Component) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            overflowX: 'hidden'
           }}
         >
           <Menu.Item as='a' onClick={() => { history.push('/') }}>
@@ -54,3 +56,5 @@ export const withSidebar = (Component) => {
     )
   }
 };
+
+export default withSidebar;

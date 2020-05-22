@@ -64,9 +64,13 @@ const LoginForm = () => {
 
             <Button onClick={login} loading={isLoggingIn} primary fluid size='large'>
               Login
-          </Button>
+            </Button>
           </Segment>
         </Form>
+        <br />
+        <Button onClick={() => { history.push('/admin/login') }} loading={isLoggingIn} color='yellow' fluid size='large'>
+          Login as Admin Instead?
+        </Button>
       </Grid.Column>
     </Grid>
   )

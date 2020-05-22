@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router-dom';
-import { isAdminLoggedIn } from './isLoggedIn';
+import { isUserLoggedIn } from './isLoggedIn';
 import { Segment, Dimmer, Loader } from 'semantic-ui-react';
 
-export const withAdminAuth = (Component) => {
+export const withUserAuthSubComponent = (Component) => {
   return function (props) {
     const [isLoggedIn, setLoggedIn] = useState();
     useEffect(() => {
       async function checkLogin() {
-        const adminLogin = await isAdminLoggedIn();
-        if (adminLogin) {
+        const userLogin = await isUserLoggedIn();
+        if (userLogin) {
           setLoggedIn(true);
         }
         else {
@@ -32,8 +31,7 @@ export const withAdminAuth = (Component) => {
         <Component {...props} />
       )
     } else {
-      return (
-        <Redirect to={{ pathname: '/' }} />)
+      return <></>
     }
   }
 };

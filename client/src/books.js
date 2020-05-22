@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { withSidebar } from './components/withSidebar';
+import withSidebar from './components/withSidebar';
 import { Segment, Grid, Card, Icon, Button, Message } from 'semantic-ui-react';
 import AddBookButton from './components/sub-componenets/addBookButton';
 import EditBookButtons from './components/sub-componenets/editBookButtons';
+import IssueRequestButton from './components/sub-componenets/issueRequestbutton';
+import withAuth from './components/auth_components/withAuth';
 const axios = require('axios').default;
 
-const BookCard = ({ name, author, copies, issued }) => (
+const BookCard = (book) => (
   <Grid.Column>
     <Segment textAlign='center' raised >
       <Card>
-        <Card.Content><h4>Name: {name}</h4></Card.Content>
-        <Card.Content><Icon name='user' />Author: {author ? author.name : null}</Card.Content>
+        <Card.Content><h4>Name: {book.name}</h4></Card.Content>
+        <Card.Content><Icon name='user' />Author: {book.author ? book.author.name : null}</Card.Content>
         <Card.Content extra>
-          Total: {copies} / Issued: {issued}
+          Total: {book.copies} / Issued: {book.issued}
         </Card.Content>
       </Card>
       <EditBookButtons />
+      <IssueRequestButton book={book} />
     </Segment>
   </Grid.Column>
 )
@@ -78,4 +81,4 @@ const Books = () => {
     )
 }
 
-export default withSidebar(Books);
+export default withAuth(withSidebar(Books));

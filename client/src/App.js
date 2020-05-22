@@ -11,7 +11,6 @@ import Home from './home';
 import AddBook from './admin_pages/addBook';
 import Books from './books';
 import ViewRequests from './admin_pages/viewRequest';
-import {UserProtectedRoute, AdminProtectedRoute} from './components/auth_components/protectedRoutes';
 
 function App() {
   return (
@@ -32,7 +31,9 @@ function App() {
         <Route exact path="/admin/login" >
           <AdminLoginForm />
         </Route>
-        <UserProtectedRoute component={Home} path="/" />
+        <Route path="/">
+          <Home />
+        </Route>
       </Switch>
     </Router>
   );

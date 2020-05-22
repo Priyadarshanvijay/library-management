@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withAdminAuth } from '../components/auth_components/withAdminAuth';
-import { withSidebar } from '../components/withSidebar';
+import withSidebar from '../components/withSidebar';
 import { Card, Button, Loader, Dimmer } from 'semantic-ui-react';
 import { actions, requestType, requestStatusQuery } from '../components/sub-componenets/numToString';
 const axios = require('axios').default;

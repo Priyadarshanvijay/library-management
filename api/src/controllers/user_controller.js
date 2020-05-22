@@ -12,9 +12,9 @@ async function loginUser(req, res) {
   }
 };
 
-async function getSelf(req,res) {
+async function getSelf(req, res) {
   try {
-    const user = await User.findById(req.user._id);    
+    const user = await User.findById(req.user._id);
     res.json(user);
   } catch (e) {
     res.status(400).send();
@@ -33,7 +33,7 @@ async function registerUser(req, res) {
     const token = await user.generateAuthToken();
     res.status(201).send({ user, token });
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e.message });
   }
 };
 

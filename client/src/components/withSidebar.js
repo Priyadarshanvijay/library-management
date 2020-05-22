@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Sidebar, Menu, Segment, Icon, Container } from 'semantic-ui-react';
 import IssueReturnRequestButton from './sub-componenets/issueReturnRequestButton';
+import AddUserButton from './sub-componenets/addUserButton';
 import ViewUserHistory from './sub-componenets/viewUserHistoryButton'
 import { isUserLoggedIn } from './auth_components/isLoggedIn';
 
@@ -45,6 +46,7 @@ const withSidebar = (Component) => {
             <Icon name='book' />Books
           </Menu.Item>
           <IssueReturnRequestButton />
+          <AddUserButton />
           <ViewUserHistory />
           <Menu.Item onClick={logout} as='a'>
             <Icon name='sign-out' />

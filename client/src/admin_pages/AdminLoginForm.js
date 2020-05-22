@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react'
+import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react';
+import { withoutAuth } from '../components/auth_components/withoutAuth';
 const axios = require('axios').default;
 
 const LoginForm = () => {
@@ -71,4 +72,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default withoutAuth(LoginForm);

@@ -11,6 +11,7 @@ import Home from './home';
 import AddBook from './admin_pages/addBook';
 import Books from './books';
 import ViewRequests from './admin_pages/viewRequest';
+import MyRequests from './user_pages/myRequests';
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
         </Route>
         <Route exact path="/requests">
           <ViewRequests />
+        </Route>
+        <Route exact path="/user/requests">
+          <MyRequests />
         </Route>
         <Route exact path="/admin/login" >
           <AdminLoginForm />

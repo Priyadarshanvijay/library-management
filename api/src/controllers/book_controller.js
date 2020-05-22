@@ -76,7 +76,7 @@ async function issueBook(req, res) {
       }
       book_to_issue.issued += 1;
       issue_request.issueDate = moment().toDate();
-      issue_request.returnDate = (issueType === 1) ? moment().add(7, 'days').toDate() : moment().add((17 - moment().hour()), 'hours');
+      issue_request.returnDate = (issue_type === 1) ? moment().add(7, 'days').toDate() : moment().add((17 - moment().hour()), 'hours');
       issue_request.status = 1;    //Approved
       await book_to_issue.save();
       await issue_request.save();
@@ -213,6 +213,32 @@ async function allIssueReq(req, res) {
   }
 }
 
+async function allIssueReqUser(req, res) {
+  try {
+    const filter = {
+      issuer: req.user._id
+    };
+    if ((typeof req.query.issued !== 'undefined') && (req.query.issued === 'true')) {
+      filter.status = { $in: [1, 3] }
+    } else if ((typeof req.query.rejected !== 'undefined') && (req.query.rejected === 'true')) {
+      filter.status = 2
+    } else if ((typeof req.query.returned !== 'undefined') && (req.query.returned === 'true')) {
+      filter.status = 4
+    } else if ((typeof req.query.issue_pending !== 'undefined') && (req.query.issue_pending === 'true')) {
+      filter.status = 0
+    } else if ((typeof req.query.return_pending !== 'undefined') && (req.query.return_pending === 'true')) {
+      filter.status = 3
+    }
+    const issue_requests = await Issue_Request.find(filter);
+    for (let i = 0; i < issue_requests.length; ++i) {
+      await issue_requests[i].populate('issuer').populate('book').execPopulate();
+    }
+    res.json(issue_requests);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+}
+
 async function updateBook(req, res) {
   try {
     const updates = Object.keys(req.body);
@@ -240,6 +266,17 @@ async function deleteBook(req, res) {
   }
 }
 
+async function deleteIssueReqUser(req, res) {
+  const req_id_to_delete = req.params.id;
+  const user_id = req.user._id;
+  try {
+    const deleted_req = await Book.findOneAndDelete({ _id: req_id_to_delete, issuer: user_id });
+    res.status(204).json(deleted_req);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+}
+
 module.exports = {
   newBook,
   getAllBooks,
@@ -250,5 +287,7 @@ module.exports = {
   returnBook,
   allIssueReq,
   updateBook,
-  deleteBook
+  deleteBook,
+  allIssueReqUser,
+  deleteIssueReqUser
 }

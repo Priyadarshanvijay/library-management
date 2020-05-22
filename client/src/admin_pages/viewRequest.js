@@ -16,7 +16,6 @@ const ViewIssueRequest = () => {
     const headers = {
       Authorization: `Bearer ${localStorage.getItem('auth_token')}`
     }
-    console.log(requestStatusQuery[typeOfRequest])
     const params = typeOfRequest === 5 ? {} : { [requestStatusQuery[typeOfRequest]]: true };
     const response = await axios.get(`${process.env.REACT_APP_BASE_URI}/book/issuereq`, {
       params,
@@ -32,7 +31,7 @@ const ViewIssueRequest = () => {
     async function processRequest(toApprove) {
       let reqNow = request;
       reqNow.isLoading = true;
-      setRequestsCard([...requestsCard.slice(-1, index), reqNow, ...requestsCard.slice(index + 1)]);
+      setRequestsCard([...requestsCard.slice(undefined, index), reqNow, ...requestsCard.slice(index + 1)]);
       try {
         const headers = { Authorization: `Bearer ${localStorage.getItem('auth_token')}` };
         if (toApprove) {
@@ -63,7 +62,7 @@ const ViewIssueRequest = () => {
         } else { console.log(e) }
       }
       reqNow.isLoading = false;
-      setRequestsCard([...requestsCard.slice(-1, index), reqNow, ...requestsCard.slice(index + 1)]);
+      setRequestsCard([...requestsCard.slice(undefined, index), reqNow, ...requestsCard.slice(index + 1)]);
     }
 
     return (

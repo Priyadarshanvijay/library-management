@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import withSidebar from './components/withSidebar';
-import { Segment, Grid, Card, Icon, Button, Message } from 'semantic-ui-react';
+import { Segment, Grid, Card, Icon, Message } from 'semantic-ui-react';
 import AddBookButton from './components/sub-componenets/addBookButton';
 import EditBookButtons from './components/sub-componenets/editBookButtons';
 import IssueRequestButton from './components/sub-componenets/issueRequestbutton';
 import withAuth from './components/auth_components/withAuth';
 const axios = require('axios').default;
 
-const BookCard = (book) => (
+const BookCard = ({ book, index, setBooks }) => (
   <Grid.Column>
     <Segment textAlign='center' raised >
       <Card>
@@ -17,7 +17,7 @@ const BookCard = (book) => (
           Total: {book.copies} / Issued: {book.issued}
         </Card.Content>
       </Card>
-      <EditBookButtons />
+      <EditBookButtons book={book} index={index} setBooks={setBooks} />
       <IssueRequestButton book={book} />
     </Segment>
   </Grid.Column>
@@ -72,8 +72,8 @@ const Books = () => {
         </Grid>
         <Grid stackable columns='four'>
           {
-            books.map((book) => {
-              return <BookCard key={book._id} {...book} />
+            books.map((book, index) => {
+              return <BookCard key={book._id} book={book} index={index} setBooks={setBooks} />
             })
           }
         </Grid>

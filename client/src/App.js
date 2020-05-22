@@ -12,6 +12,7 @@ import AddBook from './admin_pages/addBook';
 import Books from './books';
 import ViewRequests from './admin_pages/viewRequest';
 import MyRequests from './user_pages/myRequests';
+import ProfilePage from './user_pages/profilePage';
 
 function App() {
   return (
@@ -31,6 +32,9 @@ function App() {
         </Route>
         <Route exact path="/user/requests">
           <MyRequests />
+        </Route>
+        <Route exact path="/user">
+          <ProfilePage />
         </Route>
         <Route exact path="/admin/login" >
           <AdminLoginForm />

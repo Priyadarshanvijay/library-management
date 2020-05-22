@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Sidebar, Menu, Segment, Icon, Container } from 'semantic-ui-react';
 import IssueReturnRequestButton from './sub-componenets/issueReturnRequestButton';
-import {withAuthSubComponent} from './auth_components/withAuth-SubComponent'
+import ViewUserHistory from './sub-componenets/viewUserHistoryButton'
+import { isUserLoggedIn } from './auth_components/isLoggedIn';
 
 const withSidebar = (Component) => {
   return function (props) {
@@ -13,7 +14,7 @@ const withSidebar = (Component) => {
       history.push("/");
     }
     return (
-      <Sidebar.Pushable as={Segment} style={{ overflowY:'hidden',height: '100vh' }}>
+      <Sidebar.Pushable as={Segment} style={{ overflowY: 'hidden', height: '100vh' }}>
         <Sidebar
           as={Menu}
           icon='labeled'
@@ -33,7 +34,10 @@ const withSidebar = (Component) => {
             <Icon name='home' />
             Home
           </Menu.Item>
-          <Menu.Item as='a'>
+          <Menu.Item as='a' onClick={async() => {
+            if(await isUserLoggedIn())
+              history.push('/user')
+          }}>
             <Icon name='user' />
             Hi {user.name}
           </Menu.Item>
@@ -41,6 +45,7 @@ const withSidebar = (Component) => {
             <Icon name='book' />Books
           </Menu.Item>
           <IssueReturnRequestButton />
+          <ViewUserHistory />
           <Menu.Item onClick={logout} as='a'>
             <Icon name='sign-out' />
             Logout

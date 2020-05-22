@@ -47,12 +47,6 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.virtual('books', {
-  ref: 'Book',
-  localField: '_id',
-  foreignField: 'issued_by'
-});
-
 userSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();

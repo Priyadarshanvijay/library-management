@@ -12,6 +12,15 @@ async function loginUser(req, res) {
   }
 };
 
+async function getSelf(req,res) {
+  try {
+    const user = await User.findById(req.user._id);    
+    res.json(user);
+  } catch (e) {
+    res.status(400).send();
+  }
+}
+
 async function registerUser(req, res) {
   const user = new User(req.body);
   const noOfDays = req.body.noOfDays;
@@ -30,14 +39,27 @@ async function registerUser(req, res) {
 
 async function getIssuedHistory(req, res) {
   try {
-    const issued_history = await Issue_Request.find({ issuer: req.user._id });
-    for (let i = 0; i < issued_history.length; ++i) {
-      await issued_history[i].populate('book').execPopulate();
+    const filter = {
+      issuer: req.user._id
+    };
+    if ((typeof req.query.issued !== 'undefined') && (req.query.issued === 'true')) {
+      filter.status = { $in: [1, 3] }
+    } else if ((typeof req.query.rejected !== 'undefined') && (req.query.rejected === 'true')) {
+      filter.status = 2
+    } else if ((typeof req.query.returned !== 'undefined') && (req.query.returned === 'true')) {
+      filter.status = 4
+    } else if ((typeof req.query.issue_pending !== 'undefined') && (req.query.issue_pending === 'true')) {
+      filter.status = 0
+    } else if ((typeof req.query.return_pending !== 'undefined') && (req.query.return_pending === 'true')) {
+      filter.status = 3
     }
-    res.json(issued_history);
+    const issue_requests = await Issue_Request.find(filter);
+    for (let i = 0; i < issue_requests.length; ++i) {
+      await issue_requests[i].populate('book').execPopulate();
+    }
+    res.json(issue_requests);
   } catch (e) {
-    console.log(e);
-    res.status(400).json(e);
+    res.status(400).json({ error: e.message });
   }
 }
 
@@ -100,5 +122,6 @@ module.exports = {
   getIssuedHistory,
   deleteIssuedHistory,
   updateSelf,
-  updateUser
+  updateUser,
+  getSelf
 }

@@ -10,7 +10,12 @@ async function newBook(req, res) {
     res.status(200).json(book);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -23,7 +28,12 @@ async function getAllBooks(req, res) {
     res.status(200).json(books);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -35,7 +45,12 @@ async function getBookById(req, res) {
     res.status(200).json(book);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -47,11 +62,11 @@ async function issueBook(req, res) {
     const issue_type = issue_request.issueType;   // 1-> Taking to home, 0-> Reading at the library
     if (issue_type === 1) {
       if (moment().hour() >= 17 || moment().hour() < 10) {
-        throw new Error('Book can be issued for home only between 10 AM and 5 PM');
+        throw new Error('Custom: Book can be issued for home only between 10 AM and 5 PM');
       }
     } else {
       if (moment().hour() >= 15 || moment().hour() < 10) {
-        throw new Error('Book can be issued for reading only between 10 AM and 3 PM');
+        throw new Error('Custom: Book can be issued for reading only between 10 AM and 3 PM');
       }
     }
     if (approve) {
@@ -62,17 +77,17 @@ async function issueBook(req, res) {
         const now = moment().toDate();
         const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
         if (days_left_in_membership <= 5) {
-          throw new Error('Less than 5 days remaining in membership');
+          throw new Error('Custom: Less than 5 days remaining in membership');
         }
       } else {
         //read here till 5 pm
         const time_till_5pm = 17 - moment().hour();
         if (issuer.readingHoursRemaining < time_till_5pm) {
-          throw new Error('Not Enough reading hours remaining in membership');
+          throw new Error('Custom: Not Enough reading hours remaining in membership');
         }
       }
       if (book_to_issue.issued >= book_to_issue.copies) {
-        throw new Error('No more copies left to issue');
+        throw new Error('Custom: No more copies left to issue');
       }
       book_to_issue.issued += 1;
       issue_request.issueDate = moment().toDate();
@@ -88,7 +103,12 @@ async function issueBook(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -99,11 +119,11 @@ async function issueReq(req, res) {
     const issue_type = req.body.home === true ? 1 : 0;   // 1-> Taking to home, 0-> Reading at the library
     if (issue_type === 1) {
       if (moment().hour() >= 17 || moment().hour() < 10) {
-        throw new Error('Book can be issued for home only between 10 AM and 5 PM');
+        throw new Error('Custom: Book can be issued for home only between 10 AM and 5 PM');
       }
     } else {
       if (moment().hour() >= 15 || moment().hour() < 10) {
-        throw new Error('Book can be issued for reading only between 10 AM and 3 PM');
+        throw new Error('Custom: Book can be issued for reading only between 10 AM and 3 PM');
       }
     }
     const issuer = await User.findById(user_id);
@@ -113,23 +133,23 @@ async function issueReq(req, res) {
       const now = moment().toDate();
       const days_left_in_membership = moment(issuer.validTill).diff(now, 'days');
       if (days_left_in_membership <= 5) {
-        throw new Error('Less than 5 days remaining in membership');
+        throw new Error('Custom: Less than 5 days remaining in membership');
       }
       if (!book_to_issue.forHome) {
-        throw new Error('Book not available to issue for home');
+        throw new Error('Custom: Book not available to issue for home');
       }
     } else {
       //read here till 5 pm
       const time_till_5pm = 17 - moment().hour();
       if (issuer.readingHoursRemaining < time_till_5pm) {
-        throw new Error('Not Enough reading hours remaining in membership');
+        throw new Error('Custom: Not Enough reading hours remaining in membership');
       }
       if (!book_to_issue.forLibrary) {
-        throw new Error('Book not available to issue for library Reading');
+        throw new Error('Custom: Book not available to issue for library Reading');
       }
     }
     if (book_to_issue.issued >= book_to_issue.copies) {
-      throw new Error('No more copies left to issue');
+      throw new Error('Custom: No more copies left to issue');
     }
     const issue_request = new Issue_Request({
       date: moment().toDate(),
@@ -142,7 +162,12 @@ async function issueReq(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -150,7 +175,7 @@ async function returnReq(req, res) {
   const issue_request_id = req.params.id;
   try {
     if (moment().hour() >= 17 || moment().hour() < 10) {
-      throw new Error('Book can be returned only between 10 AM and 5 PM');
+      throw new Error('Custom: Book can be returned only between 10 AM and 5 PM');
     }
     const issue_request = await Issue_Request.findOne({ _id: issue_request_id, issuer: req.user._id, status: 2 });
     issue_request.status = 3;    //Return Requested
@@ -158,7 +183,12 @@ async function returnReq(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -166,7 +196,7 @@ async function returnBook(req, res) {
   const issue_request_id = req.params.id;
   try {
     if (moment().hour() >= 17 || moment().hour() < 10) {
-      throw new Error('Book can be returned only between 10 AM and 5 PM');
+      throw new Error('Custom: Book can be returned only between 10 AM and 5 PM');
     }
     const issue_request = await Issue_Request.findById(issue_request_id);
     const issue_type = issue_request.issueType;
@@ -185,7 +215,12 @@ async function returnBook(req, res) {
     res.status(200).json(issue_request);
   }
   catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -209,71 +244,56 @@ async function allIssueReq(req, res) {
     }
     res.json(issue_requests);
   } catch (e) {
-    res.status(400).json({ error: e.message });
-  }
-}
-
-async function allIssueReqUser(req, res) {
-  try {
-    const filter = {
-      issuer: req.user._id
-    };
-    if ((typeof req.query.issued !== 'undefined') && (req.query.issued === 'true')) {
-      filter.status = { $in: [1, 3] }
-    } else if ((typeof req.query.rejected !== 'undefined') && (req.query.rejected === 'true')) {
-      filter.status = 2
-    } else if ((typeof req.query.returned !== 'undefined') && (req.query.returned === 'true')) {
-      filter.status = 4
-    } else if ((typeof req.query.issue_pending !== 'undefined') && (req.query.issue_pending === 'true')) {
-      filter.status = 0
-    } else if ((typeof req.query.return_pending !== 'undefined') && (req.query.return_pending === 'true')) {
-      filter.status = 3
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
     }
-    const issue_requests = await Issue_Request.find(filter);
-    for (let i = 0; i < issue_requests.length; ++i) {
-      await issue_requests[i].populate('issuer').populate('book').execPopulate();
+    else {
+      res.status(400).json();
     }
-    res.json(issue_requests);
-  } catch (e) {
-    res.status(400).json({ error: e.message });
   }
 }
 
 async function updateBook(req, res) {
   try {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'ISBN', 'author', 'copies', 'issued'];
+    const allowedUpdates = ['name', 'ISBN', 'author', 'copies'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-      throw new Error('Invalid updates!');
+      throw new Error('Custom: Invalid updates!');
     }
     const book_to_update = await Book.findById(req.params.id);
+    if (updates.includes('copies') && (book_to_update.issued > req.body.copies)) {
+      throw new Error('Custom: More books than the entered value of it\'s Copies have been already issued');
+    }
     updates.forEach((update) => book_to_update[update] = req.body[update])
     await book_to_update.save()
     res.json(book_to_update)
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
 async function deleteBook(req, res) {
   try {
-    const book_to_update = await Book.findByIdAndDelete(req.params.id);
+    const book_to_update = await Book.findById(req.params.id);
+    if(book_to_update.issued > 0){
+      throw new Error('Custom: Cant delete this book, Some Copies Of it have Already Been Issued');
+    }
+    await Book.findByIdAndDelete(req.params.id);
     res.json(book_to_update)
   } catch (e) {
-    res.status(400).json({ error: e.message });
-  }
-}
-
-async function deleteIssueReqUser(req, res) {
-  const req_id_to_delete = req.params.id;
-  const user_id = req.user._id;
-  try {
-    const deleted_req = await Book.findOneAndDelete({ _id: req_id_to_delete, issuer: user_id });
-    res.status(204).json(deleted_req);
-  } catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e.message.slice(0, 7) === "Custom:") {
+      res.status(400).json({ error: e.message });
+    }
+    else {
+      res.status(400).json();
+    }
   }
 }
 
@@ -287,7 +307,5 @@ module.exports = {
   returnBook,
   allIssueReq,
   updateBook,
-  deleteBook,
-  allIssueReqUser,
-  deleteIssueReqUser
+  deleteBook
 }

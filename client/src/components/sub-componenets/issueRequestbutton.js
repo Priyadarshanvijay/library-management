@@ -7,12 +7,15 @@ const IssueRequestButton = ({ book }) => {
   const [postingData, setPostingData] = useState(false);
   const [open, setOpen] = useState(false);
   const [dimmer, setDimmer] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const show = (dimmer) => {
     setDimmer(dimmer);
     setOpen(true);
   }
   const close = () => setOpen(false);
   const submitIssueRequest = async (forHome) => {
+    setErrorMessage('');
     setPostingData(true);
     const formData = {
       home: forHome
@@ -28,6 +31,11 @@ const IssueRequestButton = ({ book }) => {
       setPostingData(false);
       close();
     } catch (e) {
+      if (e.response && e.response.data && e.response.data.error && e.response.data.error.length > 8) {
+        if (e.response.data.error.slice(0, 7) === "Custom:") {
+          setErrorMessage(e.response.data.error.slice(8));
+        }
+      }
       setPostingData(false);
     }
   }
@@ -43,10 +51,11 @@ const IssueRequestButton = ({ book }) => {
       <Modal dimmer={dimmer} open={open} onClose={close}>
         <Modal.Header>Issue {book.name} : {book.author.name}</Modal.Header>
         <Modal.Content>
-          <Form>
+          <Form error={errorMessage !== ''}>
             <Grid stackable>
               <Grid.Row columns={1}>
                 <Grid.Column>
+                  <Message error>{errorMessage}</Message>
                   {
                     (book.forHome && book.forLibrary) ? <Message>Do you want to issue the book for reading here or taking it home?</Message> :
                       (book.forHome) ? <Message>Do you want to issue the book for taking it home?</Message> :

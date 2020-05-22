@@ -17,7 +17,7 @@ const MyRequests = () => {
       Authorization: `Bearer ${localStorage.getItem('auth_token')}`
     }
     const params = typeOfRequest === 5 ? {} : { [requestStatusQuery[typeOfRequest]]: true };
-    const response = await axios.get(`${process.env.REACT_APP_BASE_URI}/book/user/issuereq`, {
+    const response = await axios.get(`${process.env.REACT_APP_BASE_URI}/user/issued`, {
       params,
       headers
     });
@@ -43,7 +43,7 @@ const MyRequests = () => {
           });
         } else {
           //delete 
-          const response = await axios.delete(`${process.env.REACT_APP_BASE_URI}/book/user/issuereq/${request._id}`, {}, { headers });
+          const response = await axios.delete(`${process.env.REACT_APP_BASE_URI}/user/issued/${request._id}`, {}, { headers });
         }
       } catch (e) {
         if (e.response && e.response.data) {
